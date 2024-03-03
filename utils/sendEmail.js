@@ -18,10 +18,10 @@ const sendEmail = async (options) => {
   //   }),
   // );
   const message = {
-    from: "jashanbath608@gmail.com",
+    from: "jashanbath608@gmail.com ",
     to: options.email,
     subject: options.subject,
-    text: options.message,
+    html: options.message,
   };
 
   return await sendgrid.send(message);
