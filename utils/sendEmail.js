@@ -1,8 +1,6 @@
 const dotenv = require("dotenv");
-const nodemailer = require("nodemailer");
+const emailQueue = require("./mq");
 dotenv.config({ path: "./config/config.env" });
-const sendgrid = require("@sendgrid/mail");
-sendgrid.setApiKey(process.env.SMTP_PASSWORD);
 const sendEmail = async (options) => {
   // var transporter = nodemailer.createTransport({
   //   host: process.env.SMTP_HOST,
@@ -24,7 +22,7 @@ const sendEmail = async (options) => {
     html: options.message,
   };
 
-  return await sendgrid.send(message);
+  return await emailQueue.add("send-email", message);
 };
 
 module.exports = sendEmail;
