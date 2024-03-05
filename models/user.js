@@ -22,15 +22,6 @@ const userSchema = new mongoose.Schema({
     required: [true, "Please enter your password"],
     minLength: [6, "Your password must have at least 6 characters"],
   },
-  otp: {
-    type: String,
-    minLength: [4],
-    maxLength: [20],
-  },
-  is_verified: {
-    type: Boolean,
-    default: false,
-  },
   sem: {
     type: Number,
     // required: [true, "Please enter your semester"],
