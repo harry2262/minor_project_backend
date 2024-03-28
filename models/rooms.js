@@ -18,7 +18,7 @@ const roomSchema = new mongoose.Schema({
   },
   occupants: [
     {
-      type: mongoose.Schema.Types.ObjectId,
+      type: String,
       ref: User,
     },
   ],

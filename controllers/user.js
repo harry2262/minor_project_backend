@@ -5,6 +5,8 @@ const sendToken = require("../utils/jwtToken");
 const cloudinary = require("cloudinary").v2;
 const bcrypt = require("bcryptjs");
 const OTP = require("../models/otp");
+const Room = require("../models/rooms");
+const Hostel = require("../models/hostel");
 // Register a user     => /api/v1/register
 exports.registerUser = catchAsyncErrors(async (req, res, next) => {
   console.log(req);
@@ -70,5 +72,36 @@ exports.logout = catchAsyncErrors(async (req, res, next) => {
   res.status(200).cookie("token", null, options).json({
     success: true,
     message: "Logged out !!",
+  });
+});
+
+exports.bookRoom = catchAsyncErrors(async (req, res, next) => {
+  const { studentCount, studentIds, hostel, roomNumber } = req.body;
+  if (!studentCount || !studentIds || !hostel || !roomNumber) {
+    return next(new ErrorHandler("All fields are required", 400));
+  }
+  const hostelid = await Hostel.findOne({ name: hostel });
+  if (!hostelid) {
+    return next(new ErrorHandler("Hostel not found", 400));
+  }
+  console.log(hostelid);
+  if (hostelid.roomCount < roomNumber) {
+    return next(new ErrorHandler("Room not found", 400));
+  }
+
+  const room = Room.findOne({ hostel, roomNumber });
+  if (!room) {
+    return next(new ErrorHandler("Room not found", 400));
+  }
+  if (room.capacity < studentCount) {
+    return next(new ErrorHandler("Room is full", 400));
+  }
+  const response = await Room.updateOne(
+    { roomNumber },
+    { $push: { occupants: { $each: studentIds } } },
+  );
+  res.status(200).json({
+    success: true,
+    message: "Room booked successfully",
   });
 });

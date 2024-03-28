@@ -9,6 +9,7 @@ const {
   updateUserProfile,
   getFilteredUsers,
   logout,
+  bookRoom,
 } = require("../controllers/user");
 
 const { isAuthenticatedUser } = require("../middleWares/auth");
@@ -32,4 +33,5 @@ router.route("/test").get(async (req, res) => {
       "Welcome to the API, this is test route, Server running successfully !!",
   });
 });
+router.route("/bookRoom").post(bookRoom);
 module.exports = router;
