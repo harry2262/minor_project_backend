@@ -10,6 +10,7 @@ const {
   getFilteredUsers,
   logout,
   bookRoom,
+  sendEmail,
 } = require("../controllers/user");
 
 const { isAuthenticatedUser } = require("../middleWares/auth");
@@ -34,4 +35,5 @@ router.route("/test").get(async (req, res) => {
   });
 });
 router.route("/bookRoom").post(bookRoom);
+router.route("/sendEmail").post(sendEmail);
 module.exports = router;

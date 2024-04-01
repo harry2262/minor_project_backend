@@ -7,6 +7,7 @@ const bcrypt = require("bcryptjs");
 const OTP = require("../models/otp");
 const Room = require("../models/rooms");
 const Hostel = require("../models/hostel");
+const sendTimedEmail = require("../utils/sendTimedEmail");
 // Register a user     => /api/v1/register
 exports.registerUser = catchAsyncErrors(async (req, res, next) => {
   console.log(req);
@@ -103,5 +104,14 @@ exports.bookRoom = catchAsyncErrors(async (req, res, next) => {
   res.status(200).json({
     success: true,
     message: "Room booked successfully",
+  });
+});
+exports.sendEmail = catchAsyncErrors(async (req, res, next) => {
+  const { to } = req.body;
+  const mailResponse = await sendTimedEmail({ email: to });
+  res.status(200).json({
+    success: true,
+    message: "Email sent successfully",
+    mailResponse,
   });
 });

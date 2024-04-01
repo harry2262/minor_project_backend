@@ -1,7 +1,7 @@
 const dotenv = require("dotenv");
-const { emailQueue } = require("./mq");
+const { timedQueue } = require("./mq");
 dotenv.config({ path: "./config/config.env" });
-const sendEmail = async (options) => {
+const sendTimedEmail = async (options) => {
   // var transporter = nodemailer.createTransport({
   //   host: process.env.SMTP_HOST,
   //   port: process.env.SMTP_PORT,
@@ -16,13 +16,10 @@ const sendEmail = async (options) => {
   //   }),
   // );
   const message = {
-    from: "jashanbath608@gmail.com ",
     to: options.email,
-    subject: options.subject,
-    html: options.message,
   };
 
-  return await emailQueue.add("send-email", message);
+  return await timedQueue.add("send-email", message);
 };
 
-module.exports = sendEmail;
+module.exports = sendTimedEmail;
