@@ -25,6 +25,13 @@ const userSchema = new mongoose.Schema({
     type: Number,
     // required: [true, "Please enter your semester"],
   },
+  hostel: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Hostel",
+  },
+  roomNumber: {
+    type: String,
+  },
   year: {
     type: Number,
     // required: [true, "Please enter your year"],

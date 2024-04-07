@@ -4,16 +4,6 @@ const roomSchema = new mongoose.Schema({
   roomNumber: {
     type: String,
     required: true,
-    validate: {
-      validator: async function (value) {
-        const room = await mongoose.model("Hostel").findOne({
-          "rooms.roomNumber": value,
-        });
-        return !room; // Return true if room number is unique, false otherwise
-      },
-      message: (props) =>
-        `Room number ${props.value} already exists in this hostel`,
-    },
   },
   floor: {
     type: Number,
@@ -23,12 +13,14 @@ const roomSchema = new mongoose.Schema({
     type: Number,
     default: 1,
   },
-  occupants: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: User,
-    },
-  ],
+  occupants: {
+    type: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+  },
 });
 const hostelSchema = new mongoose.Schema({
   name: {

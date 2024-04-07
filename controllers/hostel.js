@@ -1,4 +1,5 @@
 const Hostel = require("../models/hostel");
+const User = require("../models/user");
 const ErrorHandler = require("../utils/errorHandlers");
 const catchAsyncErrors = require("../middleWares/catchAsyncErrors");
 exports.addHostel = catchAsyncErrors(async (req, res, next) => {
@@ -33,6 +34,7 @@ exports.updateHostel = catchAsyncErrors(async (req, res, next) => {
     // console.log(result);
     return next(new ErrorHandler("hostel not found", 400));
   }
+
   result = await Hostel.findOneAndUpdate(
     { name: hostelData.name },
     { $push: { rooms: { $each: hostelData.rooms } } },
@@ -59,6 +61,57 @@ exports.getHostel = catchAsyncErrors(async (req, res, next) => {
     result,
   });
 });
+exports.bookRoom = catchAsyncErrors(async (req, res, next) => {
+  const { studentId, hostelName, roomNumber } = req.body;
+  if (!studentId || !hostelName || !roomNumber) {
+    return next(new ErrorHandler("all fields are required", 400));
+  }
+  let hostel = await Hostel.findOne({ name: hostelName });
+  if (!hostel) {
+    return next(new ErrorHandler("hostel not found", 400));
+  }
+  let user = await User.findOne({ email: studentId });
+  if (!user) {
+    return next(new ErrorHandler("user not found", 400));
+  }
+  // let room = await Hostel.findOne({ "rooms.roomNumber": roomNumber });
+  console.log(hostel.rooms);
+  const roomIndex = hostel.rooms.findIndex(
+    (room) => room.roomNumber === roomNumber,
+  );
+  // let room = hostel.rooms.find((room) => room.roomNumber === roomNumber);
+  if (roomIndex === -1) {
+    return next(new ErrorHandler("room not found", 400));
+  }
+  console.log(roomIndex);
+  const room = hostel.rooms[roomIndex];
+
+  console.log(hostel.rooms[roomIndex].occupants);
+  if (room.occupants.length >= room.capacity) {
+    return res.status(400).json({ error: "Room is already full" });
+  }
+
+  const userIndex = room.occupants.findIndex(
+    (id) => id.toString() === user._id.toString(),
+  );
+  if (userIndex !== -1) {
+    return res.status(400).json({ error: "User is already in the room" });
+  }
+  // Add the studentId to the occupants array
+  hostel.rooms[roomIndex].occupants.push(user._id);
+
+  console.log(hostel.rooms[roomIndex].occupants);
+  user.hostel = hostel._id;
+  user.roomNumber = roomNumber;
+  await user.save();
+  // Save the hostel document
+  await hostel.save();
+  res.status(200).json({
+    success: true,
+    message: "room booked successfully",
+  });
+});
+
 // exports.insertRooms = catchAsyncErrors(async (req, res, next) => {
 //   const { hostel, start, end, capacity } = req.body;
 //   if (!hostel || !start || !end || !capacity) {
